@@ -51,10 +51,10 @@ static char		*ft_trim(char *s)
 		i++;
 	if (s[i] == '\0')
 		return (NULL);
-	if (!(s2 = (char*)malloc(sizeof(char) * i)))
+	if (!(s2 = (char*)malloc(sizeof(char) * i + 1)))
 		return (NULL);
 	i = 0;
-	while (s[i] != '\n')
+	while (s[i] != '\n' && s[i] != '\0')
 	{
 		s2[i] = s[i];
 		i++;
@@ -79,7 +79,6 @@ static int		ft_w2(char **line, char **buffer)
 		while (*buffer2)
 			buffer2++;
 		*buffer = ft_strdup(buffer2);
-		//free(str);
 		return (1);
 	}
 	while (*buffer2 != '\n')
@@ -96,11 +95,12 @@ int				get_next_line(const int fd, char **line)
 	int			n;
 	char		*tmp;
 
+	n = 1;
 	if (fd < 0 || fd == 2)
 		return (-1);
 	if (buffer[fd] == NULL)
 		buffer[fd] = ft_strnew(0);
-	while (1)
+	while (n != 0)
 	{
 		tmp = (char*)malloc(sizeof(char) * (BUFF_SIZE + 1));
 		n = read(fd, tmp, BUFF_SIZE);
@@ -108,15 +108,6 @@ int				get_next_line(const int fd, char **line)
 			return (-1);
 		tmp[n] = '\0';
 		buffer[fd] = ft_strjoin2(buffer[fd], tmp);
-		if (n == 0)
-			return (ft_w2(line, &buffer[fd]));
 	}
-}
-int main()
-{
-	char *line;
-	int fd = open("file", O_RDONLY);
-	printf("%i line:%s\n", get_next_line(fd, &line), line);
-	printf("%i line:%s\n", get_next_line(fd, &line), line);
-	printf("%i line:%s\n", get_next_line(fd, &line), line);
+	return (ft_w2(line, &buffer[fd]));
 }
