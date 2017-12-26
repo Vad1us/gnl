@@ -96,7 +96,7 @@ int				get_next_line(const int fd, char **line)
 	char		*tmp;
 
 	n = 1;
-	if (fd < 0 || fd == 2)
+	if (fd < 0 || !line)
 		return (-1);
 	if (buffer[fd] == NULL)
 		buffer[fd] = ft_strnew(0);
