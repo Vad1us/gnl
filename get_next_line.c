@@ -12,29 +12,15 @@
 
 #include "get_next_line.h"
 
-char			*ft_strjoin2(char *s1, char *s2)
+static int		ft_check(char *buffer)
 {
-	int			len;
-	int			i;
-	int			i2;
-	char		*s3;
-
-	if (s1 == NULL || s2 == NULL)
-		return (NULL);
-	len = ft_strlen(s1) + ft_strlen(s2);
-	s3 = (char*)malloc(sizeof(char) * len + 1);
-	if (s3 == NULL)
-		return (NULL);
-	i = 0;
-	i2 = 0;
-	while (s1[i2])
-		s3[i++] = s1[i2++];
-	i2 = 0;
-	while (s2[i2])
-		s3[i++] = s2[i2++];
-	s3[i] = '\0';
-	ft_strdel(&s1);
-	return (s3);
+	while (*buffer != '\0')
+	{
+		if (*buffer == '\n')
+			return (0);
+		buffer++;
+	}
+	return (1);
 }
 
 static char		*ft_trim(char *s)
@@ -91,24 +77,28 @@ static int		ft_w2(char **line, char **buffer)
 
 int				get_next_line(const int fd, char **line)
 {
-	static char	*buffer[45000];
+	static char	*buffer[OPEN_MAX];
 	int			n;
 	char		*tmp;
+	char		*s;
 
 	n = 1;
-	if (fd < 0 || !line)
+	if (fd < 0 || !line || fd > OPEN_MAX)
 		return (-1);
 	if (buffer[fd] == NULL)
 		buffer[fd] = ft_strnew(0);
-	while (n != 0)
+	while (n != 0 && ft_check(buffer[fd]) == 1)
 	{
 		tmp = (char*)malloc(sizeof(char) * (BUFF_SIZE + 1));
 		n = read(fd, tmp, BUFF_SIZE);
 		if (n == -1)
 			return (-1);
 		tmp[n] = '\0';
-		buffer[fd] = ft_strjoin2(buffer[fd], tmp);
-		free(tmp);
+		s = ft_strdup(buffer[fd]);
+		ft_strdel(&buffer[fd]);
+		buffer[fd] = ft_strjoin(s, tmp);
+		ft_strdel(&tmp);
+		ft_strdel(&s);
 	}
 	return (ft_w2(line, &buffer[fd]));
 }
