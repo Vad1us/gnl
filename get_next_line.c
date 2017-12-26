@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 char			*ft_strjoin2(char *s1, char *s2)
 {
@@ -35,7 +34,6 @@ char			*ft_strjoin2(char *s1, char *s2)
 		s3[i++] = s2[i2++];
 	s3[i] = '\0';
 	ft_strdel(&s1);
-	ft_strdel(&s2);
 	return (s3);
 }
 
@@ -69,6 +67,7 @@ static int		ft_w2(char **line, char **buffer)
 	char		*str;
 
 	buffer2 = ft_strdup(*buffer);
+	ft_strdel(buffer);
 	str = buffer2;
 	if (*buffer2 == '\0')
 		return (0);
@@ -79,13 +78,14 @@ static int		ft_w2(char **line, char **buffer)
 		while (*buffer2)
 			buffer2++;
 		*buffer = ft_strdup(buffer2);
+		ft_strdel(&str);
 		return (1);
 	}
 	while (*buffer2 != '\n')
 		buffer2++;
 	buffer2++;
 	*buffer = ft_strdup(buffer2);
-	free(str);
+	ft_strdel(&str);
 	return (1);
 }
 
@@ -108,6 +108,7 @@ int				get_next_line(const int fd, char **line)
 			return (-1);
 		tmp[n] = '\0';
 		buffer[fd] = ft_strjoin2(buffer[fd], tmp);
+		free(tmp);
 	}
 	return (ft_w2(line, &buffer[fd]));
 }
